@@ -1,0 +1,10 @@
+import { createFileRoute, redirect } from "@tanstack/react-router";
+
+export const Route = createFileRoute("/")({
+  ssr: false,
+  beforeLoad: () => {
+    if (typeof window === "undefined") return;
+    const token = window.localStorage.getItem("estora_token");
+    throw redirect({ to: token ? "/dashboard" : "/login" });
+  },
+});
