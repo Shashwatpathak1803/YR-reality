@@ -1,0 +1,94 @@
+import { createFileRoute } from "@tanstack/react-router";
+import Navbar from "@/components/Navbar";
+import Hero from "@/components/Hero";
+import FeaturedProperties from "@/components/FeaturedProperties";
+import Categories from "@/components/Categories";
+import Gallery from "@/components/Gallery";
+import WhyChooseUs from "@/components/WhyChooseUs";
+import Process from "@/components/Process";
+import Testimonials from "@/components/Testimonials";
+import FAQ from "@/components/FAQ";
+import Contact from "@/components/Contact";
+import SiteVisitForm from "@/components/SiteVisitForm";
+import SiteVisitPopup from "@/components/SiteVisitPopup";
+import Footer from "@/components/Footer";
+import FloatingButtons from "@/components/FloatingButtons";
+import { SearchFilterProvider } from "@/lib/search-filter";
+
+export const Route = createFileRoute("/")({
+  component: Index,
+  head: () => ({
+    meta: [
+      { title: "PrimeLand Realty — Find Your Dream Plot Today" },
+      {
+        name: "description",
+        content:
+          "Verified residential plots, commercial plots, luxury villas, apartments and flats across Delhi NCR. Book a free site visit with PrimeLand Realty.",
+      },
+      { property: "og:title", content: "PrimeLand Realty — Find Your Dream Plot Today" },
+      {
+        property: "og:description",
+        content:
+          "Premium real estate — plots, villas, flats and commercial spaces. RERA verified. Loan assistance. 24×7 support.",
+      },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "/" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "PrimeLand Realty" },
+      {
+        name: "twitter:description",
+        content: "Verified plots, villas, flats and commercial properties in Delhi NCR.",
+      },
+    ],
+    links: [
+      { rel: "canonical", href: "/" },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap",
+      },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "RealEstateAgent",
+          name: "PrimeLand Realty",
+          description:
+            "Verified residential plots, commercial plots, villas, apartments and flats.",
+          telephone: ["+917827675767", "+919971405532"],
+          email: "info@primelandrealty.com",
+          areaServed: "Delhi NCR",
+          address: { "@type": "PostalAddress", addressLocality: "Delhi NCR", addressCountry: "IN" },
+        }),
+      },
+    ],
+  }),
+});
+
+function Index() {
+  return (
+    <SearchFilterProvider>
+      <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
+        <Navbar />
+        <main>
+          <Hero />
+          <Categories />
+          <FeaturedProperties />
+          <WhyChooseUs />
+          <Process />
+          <Gallery />
+          <Testimonials />
+          <FAQ />
+          <SiteVisitForm />
+          <Contact />
+        </main>
+        <Footer />
+        <FloatingButtons />
+        <SiteVisitPopup />
+      </div>
+    </SearchFilterProvider>
+  );
+}
