@@ -9,6 +9,12 @@ class EnquiryService extends BaseService {
 
   // Every enquiry automatically creates (or reuses) a customer record.
   async create(payload) {
+    // WhatsApp/Call button clicks carry no real contact info — record the
+    // enquiry for tracking but don't create a customer out of it.
+    if (payload.sourcePage === 'whatsapp-click' || payload.sourcePage === 'call-click') {
+      return enquiryRepository.create(payload);
+    }
+
     const customer = await customerService.findOrCreate({
       name: payload.name,
       phone: payload.phone,
