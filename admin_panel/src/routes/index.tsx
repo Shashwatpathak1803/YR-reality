@@ -4,7 +4,7 @@ export const Route = createFileRoute("/")({
   ssr: false,
   beforeLoad: () => {
     if (typeof window === "undefined") return;
-    const token = window.localStorage.getItem("estora_token");
+    const token = window.localStorage.getItem("YRrealty_token");
     throw redirect({ to: token ? "/dashboard" : "/login" });
   },
 });

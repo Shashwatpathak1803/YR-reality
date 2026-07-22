@@ -1,0 +1,42 @@
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls } from "@react-three/drei";
+
+function Box() {
+  return (
+    <mesh rotation={[0.4, 0.6, 0]}>
+      <boxGeometry args={[2, 2, 2]} />
+      <meshStandardMaterial color="#2563eb" />
+    </mesh>
+  );
+}
+
+export default function Hero3D() {
+  return (
+    <div className="w-full h-[600px]">
+      <Canvas
+        camera={{
+          position: [0, 1, 6],
+          fov: 50,
+        }}
+      >
+        {/* Light */}
+        <ambientLight intensity={1.5} />
+
+        <directionalLight
+          position={[5, 5, 5]}
+          intensity={2}
+        />
+
+        {/* Cube */}
+        <Box />
+
+        {/* Mouse Rotate */}
+        <OrbitControls
+          enableZoom={false}
+          autoRotate
+          autoRotateSpeed={2}
+        />
+      </Canvas>
+    </div>
+  );
+}

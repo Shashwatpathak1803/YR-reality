@@ -15,7 +15,7 @@ export const api = axios.create({
 
 api.interceptors.request.use((config) => {
   if (typeof window !== "undefined") {
-    const token = window.localStorage.getItem("estora_token");
+    const token = window.localStorage.getItem("YRrealty_token");
     if (token) config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
@@ -26,8 +26,8 @@ api.interceptors.response.use(
   (error) => {
     const status = error?.response?.status;
     if (status === 401 && typeof window !== "undefined") {
-      window.localStorage.removeItem("estora_token");
-      window.localStorage.removeItem("estora_user");
+      window.localStorage.removeItem("YRrealty_token");
+      window.localStorage.removeItem("YRrealty_user");
       if (!window.location.pathname.startsWith("/login")) {
         window.location.href = "/login";
       }

@@ -178,26 +178,39 @@ export function useGalleryImages() {
 // Contact info helper — backend settings with sensible defaults
 // ---------------------------------------------------------------------------
 export const DEFAULT_CONTACT = {
-  companyName: "PrimeLand Realty",
-  phones: ["7827675767", "9971405532"],
-  email: "info@primelandrealty.com",
+  companyName: "YR Realty",
+  phones: [] as string[],
+  email: "",
   address: "Delhi NCR",
-  whatsapp: "917827675767",
+  whatsapp: "",
   socialLinks: {} as NonNullable<ApiSettings["socialLinks"]>,
 };
 
-export function useContactInfo() {
-  const { data } = useSettings();
-  const phones = data?.phoneNumbers?.filter(Boolean);
+function normalizeContactInfo(data?: ApiSettings) {
+  const phones = data?.phoneNumbers?.filter(Boolean) ?? [];
   return {
     companyName: data?.companyName || DEFAULT_CONTACT.companyName,
-    phones: phones?.length ? phones : DEFAULT_CONTACT.phones,
+    phones: phones.length ? phones : DEFAULT_CONTACT.phones,
     email: data?.email || DEFAULT_CONTACT.email,
     address: data?.address || DEFAULT_CONTACT.address,
     whatsapp: (data?.whatsapp || DEFAULT_CONTACT.whatsapp).replace(/[^\d]/g, ""),
     googleMap: data?.googleMap || "",
     socialLinks: data?.socialLinks ?? DEFAULT_CONTACT.socialLinks,
   };
+}
+
+export async function getContactInfoSnapshot() {
+  try {
+    const data = await request<ApiSettings>("/settings");
+    return normalizeContactInfo(data);
+  } catch {
+    return normalizeContactInfo();
+  }
+}
+
+export function useContactInfo() {
+  const { data } = useSettings();
+  return normalizeContactInfo(data);
 }
 
 // ---------------------------------------------------------------------------

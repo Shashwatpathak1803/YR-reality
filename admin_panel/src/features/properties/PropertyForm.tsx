@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { useMemo, useState, useRef } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import {
   categoryService,
   propertyService,
@@ -66,7 +66,7 @@ interface Props {
 export function PropertyForm({ mode, initial, onSaved }: Props) {
   const qc = useQueryClient();
   const [amenities, setAmenities] = useState<string[]>(initial?.amenities ?? []);
-  const [existingImages] = useState<string[]>(initial?.images ?? []);
+  const [existingImages, setExistingImages] = useState<string[]>(initial?.images ?? []);
   const [newFiles, setNewFiles] = useState<File[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -96,10 +96,31 @@ export function PropertyForm({ mode, initial, onSaved }: Props) {
     keywords: initial?.keywords?.join(", ") ?? "",
   }), [initial]);
 
-  const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm<FormData>({
-    resolver: zodResolver(schema),
-    defaultValues: defaults,
-  });
+const {
+  register,
+  handleSubmit,
+  formState: { errors },
+  watch,
+  setValue,
+  reset,
+} = useForm<FormData>({
+  resolver: zodResolver(schema),
+  defaultValues: defaults,
+});
+
+const initializedIdRef = useRef<string | undefined>(undefined);
+
+useEffect(() => {
+  // Only reset the form the first time we see this property's data.
+  // Without this guard, every background refetch (tab focus, cache
+  // invalidation, etc.) hands us a new `initial` object reference and
+  // wipes out whatever the user has typed so far.
+  if (initial && initializedIdRef.current !== initial.id) {
+    reset(defaults);
+    setAmenities(initial.amenities ?? []);
+    initializedIdRef.current = initial.id;
+  }
+}, [initial, defaults, reset]);
 
   const toggleAmenity = (a: string) => setAmenities(s => s.includes(a) ? s.filter(x => x !== a) : [...s, a]);
 
@@ -114,6 +135,7 @@ export function PropertyForm({ mode, initial, onSaved }: Props) {
   };
 
   const removeNewFile = (i: number) => setNewFiles(prev => prev.filter((_, idx) => idx !== i));
+  const removeExistingImage = (i: number) => setExistingImages(prev => prev.filter((_, idx) => idx !== i));
 
   const saveMutation = useMutation({
     mutationFn: (input: PropertyInput) =>
@@ -154,6 +176,7 @@ export function PropertyForm({ mode, initial, onSaved }: Props) {
       seoDescription: data.metaDescription || undefined,
       keywords: data.keywords || undefined,
       imageFiles: newFiles,
+      existingImages: mode === "edit" ? existingImages : undefined,
     });
   };
 
@@ -346,8 +369,11 @@ export function PropertyForm({ mode, initial, onSaved }: Props) {
                   <p className="text-xs font-medium text-muted-foreground mb-2">Current images</p>
                   <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
                     {existingImages.map((src, i) => (
-                      <div key={i} className="relative aspect-square rounded-lg overflow-hidden border border-border">
+                      <div key={i} className="group relative aspect-square rounded-lg overflow-hidden border border-border">
                         <img src={src} alt="" className="h-full w-full object-cover" />
+                        <button type="button" onClick={() => removeExistingImage(i)} className="absolute top-1 right-1 grid h-6 w-6 place-items-center rounded-full bg-background/90 text-destructive opacity-0 group-hover:opacity-100 transition-opacity">
+                          <X className="h-3 w-3" />
+                        </button>
                         {i === 0 && <Badge className="absolute bottom-1 left-1 bg-gold text-gold-foreground border-transparent text-[9px]">COVER</Badge>}
                       </div>
                     ))}

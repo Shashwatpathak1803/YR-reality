@@ -55,36 +55,52 @@ export default function FeaturedProperties() {
   if (!properties.length && !searching) return null;
 
   return (
-    <section id="properties" className="py-20 sm:py-28">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="properties" className="py-20 sm:py-28 relative overflow-hidden">
+      {/* Faint blueprint grid, matching the hero and other sections */}
+      <div
+        className="absolute inset-0 opacity-[0.035] pointer-events-none"
+        style={{
+          backgroundImage:
+            "linear-gradient(to right, #C9A227 1px, transparent 1px), linear-gradient(to bottom, #C9A227 1px, transparent 1px)",
+          backgroundSize: "48px 48px",
+        }}
+      />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="text-center max-w-2xl mx-auto"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wide">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-amber-300/50 bg-amber-50 text-amber-800 text-xs font-semibold tracking-[0.15em]">
             {searching ? "SEARCH RESULTS" : "FEATURED PROPERTIES"}
           </div>
-          <h2 className="mt-4 font-display font-bold text-3xl sm:text-5xl leading-tight">
+          <h2 className="mt-4 font-display font-bold text-3xl sm:text-5xl leading-tight text-neutral-900">
             {searching ? (
               <>
                 {properties.length} propert{properties.length === 1 ? "y" : "ies"}{" "}
-                <span className="text-gradient">found</span>
+                <span className="bg-gradient-to-r from-amber-600 via-amber-500 to-amber-700 bg-clip-text text-transparent">
+                  found
+                </span>
               </>
             ) : (
               <>
-                Handpicked <span className="text-gradient">premium listings</span>
+                Handpicked{" "}
+                <span className="bg-gradient-to-r from-amber-600 via-amber-500 to-amber-700 bg-clip-text text-transparent">
+                  premium listings
+                </span>
               </>
             )}
           </h2>
-          <p className="mt-4 text-muted-foreground">
+          <div className="w-16 h-px bg-amber-400/70 mx-auto mt-5" />
+          <p className="mt-5 text-neutral-500">
             Verified plots, villas, apartments and commercial spaces from trusted developers.
           </p>
           {searching && (
             <button
               onClick={() => setFilter(null)}
-              className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-input text-sm font-semibold hover:bg-muted transition"
+              className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-amber-300/50 text-neutral-700 text-sm font-semibold hover:bg-amber-50 hover:border-amber-400/70 transition-colors"
             >
               Clear search
             </button>
@@ -98,7 +114,7 @@ export default function FeaturedProperties() {
             ))}
           </div>
         ) : (
-          <p className="mt-12 text-center text-muted-foreground">
+          <p className="mt-12 text-center text-neutral-500">
             No properties match your search. Try a different type, location or budget.
           </p>
         )}

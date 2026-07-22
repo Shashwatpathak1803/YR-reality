@@ -19,7 +19,7 @@ export const testimonials: Testimonial[] = [
     avatar: t1,
     rating: 5,
     quote:
-      "PrimeLand Realty made buying our dream villa effortless. Verified documents, transparent pricing and a team that genuinely cares.",
+      "Y Realty made buying our dream villa effortless. Verified documents, transparent pricing and a team that genuinely cares.",
   },
   {
     id: "2",

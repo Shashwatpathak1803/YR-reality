@@ -3,8 +3,8 @@
  */
 import { api, unwrap } from "./api";
 
-const TOKEN_KEY = "estora_token";
-const USER_KEY = "estora_user";
+const TOKEN_KEY = "YRrealty_token";
+const USER_KEY = "YRrealty_user";
 
 export interface AdminUser {
   id: string;
@@ -49,6 +49,10 @@ export async function login(email: string, password: string, _remember: boolean)
 
 export async function changePassword(currentPassword: string, newPassword: string) {
   await api.put("/auth/change-password", { currentPassword, newPassword });
+}
+
+export async function forgotPassword(email: string) {
+  await api.post("/auth/forgot-password", { email });
 }
 
 export async function logout() {

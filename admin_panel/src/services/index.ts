@@ -84,6 +84,7 @@ interface BEnquiry {
   sourcePage?: string;
   status: string;
   createdAt: string;
+  customer?: { _id: string; name?: string; phone?: string; email?: string } | string | null;
 }
 interface BSiteVisit {
   _id: string;
@@ -365,6 +366,7 @@ export interface PropertyInput {
   seoDescription?: string;
   keywords?: string;
   imageFiles?: File[];
+  existingImages?: string[]; // URLs of current images the user chose to keep (edit mode only)
 }
 
 function propertyFormData(input: PropertyInput): FormData {
@@ -394,6 +396,7 @@ function propertyFormData(input: PropertyInput): FormData {
   set("seoTitle", input.seoTitle);
   set("seoDescription", input.seoDescription);
   set("keywords", input.keywords);
+  if (input.existingImages) set("existingImages", JSON.stringify(input.existingImages));
   (input.imageFiles ?? []).forEach((f) => fd.append("images", f));
   return fd;
 }
@@ -500,6 +503,7 @@ export const enquiryService = {
     (await unwrap<BEnquiry[]>(api.get(`/enquiries?limit=${LIST_LIMIT}&sort=-createdAt`))).map(
       mapEnquiry,
     ),
+  getById: async (id: string): Promise<Enquiry> => mapEnquiry(await unwrap<BEnquiry>(api.get(`/enquiries/${id}`))),
   updateStatus: (id: string, status: string) =>
     unwrap<BEnquiry>(api.put(`/enquiries/${id}`, { status })),
   remove: (id: string) => api.delete(`/enquiries/${id}`),

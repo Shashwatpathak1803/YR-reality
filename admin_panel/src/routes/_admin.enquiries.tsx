@@ -14,7 +14,15 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Download, Search, Phone, Mail, Trash2 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Download, Search, Phone, Mail, Trash2, Eye } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -46,11 +54,26 @@ function exportCsv(rows: Enquiry[]) {
   URL.revokeObjectURL(url);
 }
 
+function sourceLabel(source?: string) {
+  if (!source) return "Website form";
+  if (source === "whatsapp-click") return "WhatsApp click";
+  if (source === "call-click") return "Call click";
+  return source;
+}
+
 function EnquiriesPage() {
   const qc = useQueryClient();
   const { data = [], isLoading } = useQuery({ queryKey: ["enquiries"], queryFn: enquiryService.list });
   const [q, setQ] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [selectedEnquiryId, setSelectedEnquiryId] = useState<string | null>(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+
+  const { data: selectedEnquiry, isFetching: isLoadingDetails } = useQuery({
+    queryKey: ["enquiry", selectedEnquiryId],
+    queryFn: () => (selectedEnquiryId ? enquiryService.getById(selectedEnquiryId) : Promise.resolve(null)),
+    enabled: Boolean(selectedEnquiryId),
+  });
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ["enquiries"] });
@@ -82,8 +105,8 @@ function EnquiriesPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Customer Enquiries"
-        description="Every form submission from your website lands here."
+        title="Leads"
+        description="Every website enquiry and direct contact activity is tracked here."
         breadcrumbs={[{ label: "Enquiries" }]}
         actions={
           <Button variant="outline" onClick={() => { exportCsv(rows); toast.success("CSV exported"); }}>
@@ -165,6 +188,75 @@ function EnquiriesPage() {
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-1">
+                        <Dialog open={detailsOpen && selectedEnquiryId === e.id} onOpenChange={(open) => {
+                          setDetailsOpen(open);
+                          if (!open) setSelectedEnquiryId(null);
+                        }}>
+                          <DialogTrigger asChild>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="h-8 w-8"
+                              aria-label={`View details for ${e.name}`}
+                              onClick={() => {
+                                setSelectedEnquiryId(e.id);
+                                setDetailsOpen(true);
+                              }}
+                            >
+                              <Eye className="h-3.5 w-3.5" />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-2xl">
+                            <DialogHeader>
+                              <DialogTitle>Lead details</DialogTitle>
+                              <DialogDescription>Full information captured for this lead.</DialogDescription>
+                            </DialogHeader>
+                            {isLoadingDetails && selectedEnquiryId === e.id ? (
+                              <div className="text-sm text-muted-foreground">Loading lead details…</div>
+                            ) : (
+                              <div className="space-y-4">
+                                <div className="grid gap-4 sm:grid-cols-2">
+                                  <div className="rounded-lg border p-3">
+                                    <div className="text-xs uppercase tracking-wide text-muted-foreground">Name</div>
+                                    <div className="mt-1 font-medium">{selectedEnquiry?.name ?? e.name}</div>
+                                  </div>
+                                  <div className="rounded-lg border p-3">
+                                    <div className="text-xs uppercase tracking-wide text-muted-foreground">Contact</div>
+                                    <div className="mt-1 font-medium">{selectedEnquiry?.phone ?? e.phone}</div>
+                                    <div className="text-sm text-muted-foreground">{selectedEnquiry?.email || e.email || "No email provided"}</div>
+                                  </div>
+                                  <div className="rounded-lg border p-3">
+                                    <div className="text-xs uppercase tracking-wide text-muted-foreground">Property</div>
+                                    <div className="mt-1 font-medium">{selectedEnquiry?.propertyTitle || e.propertyTitle || "—"}</div>
+                                  </div>
+                                  <div className="rounded-lg border p-3">
+                                    <div className="text-xs uppercase tracking-wide text-muted-foreground">Preferences</div>
+                                    <div className="mt-1 font-medium">{selectedEnquiry?.location || e.location || "—"}</div>
+                                    <div className="text-sm text-muted-foreground">Budget: {selectedEnquiry?.budget || e.budget || "—"}</div>
+                                  </div>
+                                </div>
+                                <div className="rounded-lg border p-3">
+                                  <div className="text-xs uppercase tracking-wide text-muted-foreground">Message</div>
+                                  <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">{selectedEnquiry?.message || e.message || "No message provided."}</p>
+                                </div>
+                                <div className="grid gap-4 sm:grid-cols-3 text-sm">
+                                  <div>
+                                    <div className="text-xs uppercase tracking-wide text-muted-foreground">Source</div>
+                                    <div className="mt-1 font-medium">{sourceLabel(selectedEnquiry?.source || e.source)}</div>
+                                  </div>
+                                  <div>
+                                    <div className="text-xs uppercase tracking-wide text-muted-foreground">Status</div>
+                                    <div className="mt-1 font-medium">{selectedEnquiry?.status || e.status}</div>
+                                  </div>
+                                  <div>
+                                    <div className="text-xs uppercase tracking-wide text-muted-foreground">Received</div>
+                                    <div className="mt-1 font-medium">{(selectedEnquiry?.createdAt || e.createdAt) ? format(new Date(selectedEnquiry?.createdAt || e.createdAt), "dd MMM yyyy, HH:mm") : "—"}</div>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </DialogContent>
+                        </Dialog>
                         <Button asChild size="icon" variant="ghost" className="h-8 w-8">
                           <a href={`tel:${e.phone}`} aria-label="Call"><Phone className="h-3.5 w-3.5" /></a>
                         </Button>

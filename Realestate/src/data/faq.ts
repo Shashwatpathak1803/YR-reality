@@ -3,11 +3,11 @@ export type FAQ = { q: string; a: string };
 export const faqs: FAQ[] = [
   {
     q: "How do I book a site visit?",
-    a: "Fill the Book Site Visit form or call us directly at 7827675767. Our team will confirm a slot at your preferred date and location.",
+    a: "Fill the Book Site Visit form or contact us through the phone or WhatsApp details shown on this page. Our team will confirm a slot at your preferred date and location.",
   },
   {
     q: "Are all documents verified?",
-    a: "Yes. Every property listed on PrimeLand Realty is legally verified with clear title, RERA approvals where applicable and complete due diligence.",
+    a: "Yes. Every property listed on YR Realty is legally verified with clear title, RERA approvals where applicable and complete due diligence.",
   },
   {
     q: "Can I get loan assistance?",

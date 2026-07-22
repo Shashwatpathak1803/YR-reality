@@ -13,18 +13,21 @@ export default function FloatingButtons() {
   }, []);
 
   const phone = contact.phones[0];
+  const whatsappHref = contact.whatsapp
+    ? `https://wa.me/${contact.whatsapp}?text=${encodeURIComponent("Hello Please share the detail of this project")}`
+    : undefined;
 
   return (
     <>
       {/* Floating side stack (desktop + mobile above sticky bar) */}
       <div className="fixed right-4 bottom-24 sm:bottom-6 z-40 flex flex-col gap-3">
         <a
-          href={`https://wa.me/${contact.whatsapp}`}
+          href={whatsappHref}
           aria-label="WhatsApp"
           target="_blank"
           rel="noreferrer"
           onClick={() => trackContactClick("whatsapp")}
-          className="w-12 h-12 grid place-items-center rounded-full bg-[#25D366] text-white shadow-elegant hover:scale-110 transition"
+          className="w-12 h-12 grid place-items-center rounded-full bg-[#25D366] text-white shadow-[0_8px_24px_rgba(0,0,0,0.25)] hover:scale-110 transition-transform"
         >
           <MessageCircle className="w-5 h-5" />
         </a>
@@ -32,7 +35,7 @@ export default function FloatingButtons() {
           href={`tel:${phone}`}
           aria-label="Call"
           onClick={() => trackContactClick("call")}
-          className="w-12 h-12 grid place-items-center rounded-full bg-[image:var(--gradient-primary)] text-primary-foreground shadow-elegant hover:scale-110 transition"
+          className="w-12 h-12 grid place-items-center rounded-full bg-gradient-to-br from-amber-300 via-amber-400 to-amber-500 text-neutral-900 shadow-[0_8px_24px_rgba(217,180,80,0.4)] hover:scale-110 transition-transform"
         >
           <Phone className="w-5 h-5" />
         </a>
@@ -44,7 +47,7 @@ export default function FloatingButtons() {
               exit={{ opacity: 0, scale: 0.6 }}
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
               aria-label="Back to top"
-              className="w-12 h-12 grid place-items-center rounded-full bg-foreground text-background shadow-elegant hover:scale-110 transition"
+              className="w-12 h-12 grid place-items-center rounded-full bg-neutral-900 border border-amber-400/30 text-amber-300 shadow-[0_8px_24px_rgba(0,0,0,0.3)] hover:scale-110 transition-transform"
             >
               <ArrowUp className="w-5 h-5" />
             </motion.button>
@@ -53,17 +56,17 @@ export default function FloatingButtons() {
       </div>
 
       {/* Sticky bottom bar (mobile) */}
-      <div className="sm:hidden fixed bottom-0 inset-x-0 z-40 glass border-t border-border/60 px-3 py-2 flex gap-2">
+      <div className="sm:hidden fixed bottom-0 inset-x-0 z-40 bg-white/90 backdrop-blur-xl border-t border-amber-200/50 px-3 py-2 flex gap-2">
         <a
           href={`tel:${phone}`}
           onClick={() => trackContactClick("call")}
-          className="flex-1 inline-flex items-center justify-center gap-2 h-11 rounded-full bg-[image:var(--gradient-primary)] text-primary-foreground text-sm font-semibold"
+          className="flex-1 inline-flex items-center justify-center gap-2 h-11 rounded-full bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 text-neutral-900 text-sm font-semibold shadow-[0_6px_18px_rgba(217,180,80,0.3)]"
         >
           <Phone className="w-4 h-4" /> Call Now
         </a>
         <a
           href="#visit"
-          className="flex-1 inline-flex items-center justify-center gap-2 h-11 rounded-full bg-foreground text-background text-sm font-semibold"
+          className="flex-1 inline-flex items-center justify-center gap-2 h-11 rounded-full bg-neutral-900 border border-amber-400/30 text-amber-300 text-sm font-semibold"
         >
           Book Visit
         </a>

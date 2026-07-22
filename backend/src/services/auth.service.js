@@ -1,3 +1,5 @@
+import { sendEmail } from "../utils/sendEmail.js";
+import { env } from "../config/env.js";
 import { ApiError } from '../utils/ApiError.js';
 import { HTTP_STATUS } from '../constants/httpStatus.js';
 import { adminRepository } from '../repositories/admin.repository.js';
@@ -48,21 +50,98 @@ class AuthService {
     return true;
   }
 
-  // Future-ready: forgot password flow (email service to be integrated)
-  async forgotPassword(email) {
-    const admin = await adminRepository.findOne({ email });
-    if (!admin) {
-      // Do not reveal whether the email exists
-      return null;
-    }
-    const crypto = await import('crypto');
-    const resetToken = crypto.randomBytes(32).toString('hex');
-    admin.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-    admin.passwordResetExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
-    await admin.save({ validateBeforeSave: false });
-    return resetToken; // TODO: send via email service once integrated
+async forgotPassword(email) {
+
+  console.log("Forgot password email received:", email);
+
+  const admin = await adminRepository.findOne({ email });
+
+  console.log("Admin found:", admin);
+
+  // Don't reveal whether the email exists
+  if (!admin) {
+    console.log("No admin found with this email");
+    return null;
   }
 
+  const crypto = await import("crypto");
+
+  // Generate reset token
+  const resetToken = crypto.randomBytes(32).toString("hex");
+
+  // Store hashed token
+  admin.passwordResetToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  // Token expires in 10 minutes
+  admin.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+  await admin.save({ validateBeforeSave: false });
+
+  // Frontend reset URL
+  const resetURL = `${env.ADMIN_URL}/reset-password/${resetToken}`;
+
+  // Beautiful HTML email
+  const html = `
+  <div style="max-width:600px;margin:auto;padding:30px;font-family:Arial,sans-serif">
+
+      <h2 style="color:#0F4C81;">
+        YR Reality
+      </h2>
+
+      <p>Hello <strong>${admin.name}</strong>,</p>
+
+      <p>
+        We received a request to reset your password.
+      </p>
+
+      <p>
+        Click the button below to create a new password.
+      </p>
+
+      <p style="text-align:center;margin:35px 0;">
+        <a href="${resetURL}"
+           style="
+           background:#0F4C81;
+           color:#fff;
+           text-decoration:none;
+           padding:14px 30px;
+           border-radius:6px;
+           font-size:16px;">
+           Reset Password
+        </a>
+      </p>
+
+      <p>
+        This link will expire in
+        <strong>10 minutes</strong>.
+      </p>
+
+      <p>
+        If you didn't request this password reset,
+        you can safely ignore this email.
+      </p>
+
+      <hr>
+
+      <small>
+      © ${new Date().getFullYear()} YR Reality.
+      All Rights Reserved.
+      </small>
+
+  </div>
+  `;
+
+  await sendEmail({
+    to: admin.email,
+    subject: "Reset Your YR Reality Password",
+    html,
+  });
+
+  return true;
+}
   async resetPassword(rawToken, newPassword) {
     const crypto = await import('crypto');
     const hashedToken = crypto.createHash('sha256').update(rawToken).digest('hex');

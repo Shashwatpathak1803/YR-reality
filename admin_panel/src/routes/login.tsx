@@ -17,7 +17,7 @@ export const Route = createFileRoute("/login")({
   component: LoginPage,
   head: () => ({
     meta: [
-      { title: "Sign in — Estora Admin" },
+      { title: "Sign in — Welcome to YR Realty" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -64,7 +64,7 @@ function LoginPage() {
               <Building2 className="h-5 w-5" />
             </div>
             <div>
-              <div className="font-display text-xl font-semibold leading-none">Estora</div>
+              <div className="font-display text-xl font-semibold leading-none">YR Realty</div>
               <div className="text-[10px] uppercase tracking-widest text-muted-foreground mt-1">Admin Console</div>
             </div>
           </div>
@@ -84,9 +84,12 @@ function LoginPage() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
-                <button type="button" className="text-xs text-primary hover:underline" onClick={() => toast.info("Password reset link sent (mock)")}>
-                  Forgot password?
-                </button>
+                <Link 
+                     to="/forgot-password" 
+                     className="text-xs text-primary hover:underline"
+                     >
+                      Forgot password?
+                     </Link>
               </div>
               <Input id="password" type="password" autoComplete="current-password" placeholder="••••••••" {...register("password")} />
               {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
@@ -110,7 +113,7 @@ function LoginPage() {
           </form>
 
           <p className="mt-8 text-xs text-muted-foreground">
-            © {new Date().getFullYear()} Estora Real Estate. <Link to="/dashboard" className="hover:underline">Preview dashboard</Link>
+            © {new Date().getFullYear()} YR Realty Estate. <Link to="/dashboard" className="hover:underline">Preview dashboard</Link>
           </p>
         </motion.div>
       </div>

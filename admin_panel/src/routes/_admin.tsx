@@ -7,7 +7,7 @@ export const Route = createFileRoute("/_admin")({
   ssr: false,
   beforeLoad: () => {
     if (typeof window === "undefined") return;
-    const token = window.localStorage.getItem("estora_token");
+    const token = window.localStorage.getItem("YRrealty_token");
     if (!token) throw redirect({ to: "/login" });
   },
   component: AdminLayout,

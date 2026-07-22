@@ -1,4 +1,4 @@
-import { Home, Building2, Layers, Tag, MessageSquare, CalendarCheck, Users, Image, Star, FileText, HelpCircle, Settings, User } from "lucide-react";
+import { Home, Building2, Layers, Tag, MessageSquare, CalendarCheck, Users, Image, Star, HelpCircle, Settings, User } from "lucide-react";
 import type { ComponentType } from "react";
 
 export interface NavItem {
@@ -17,7 +17,6 @@ export const NAV_ITEMS: NavItem[] = [
   { title: "Customers", to: "/customers", icon: Users },
   { title: "Media Gallery", to: "/media", icon: Image },
   { title: "Testimonials", to: "/testimonials", icon: Star },
-  { title: "Blogs", to: "/blogs", icon: FileText },
   { title: "FAQ", to: "/faq", icon: HelpCircle },
   { title: "Settings", to: "/settings", icon: Settings },
   { title: "Profile", to: "/profile", icon: User },

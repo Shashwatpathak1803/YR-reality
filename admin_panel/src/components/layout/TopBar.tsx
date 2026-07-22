@@ -38,7 +38,7 @@ export function TopBar() {
       <SidebarTrigger className="text-foreground" />
       <div className="hidden md:flex flex-col min-w-0">
         <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-          Estora Admin
+          YR realty Admin
         </span>
         <span className="font-display text-base leading-none text-foreground truncate">
           {current?.title ?? "Overview"}

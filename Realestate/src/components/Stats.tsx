@@ -2,10 +2,10 @@ import { motion, useInView, useMotionValue, useTransform, animate } from "framer
 import { useEffect, useRef } from "react";
 
 const stats = [
-  { value: 500, suffix: "+", label: "Plots Sold" },
-  { value: 1000, suffix: "+", label: "Happy Families" },
-  { value: 15, suffix: "+", label: "Projects" },
-  { value: 100, suffix: "%", label: "Verified Properties" },
+  { value: 500, suffix: "+", label: "Happy Buyers" },
+  { value: 1000, suffix: "+", label: "Property Consultations" },
+  { value: 15, suffix: "+", label: "Premium Projects" },
+  { value: 100, suffix: "%", label: "Verified Listings" },
 ];
 
 function Counter({ to, suffix }: { to: number; suffix: string }) {
@@ -39,12 +39,12 @@ export default function Stats() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: i * 0.08 }}
-          className="glass rounded-2xl p-5 text-center shadow-soft"
+          className="rounded-2xl p-5 text-center bg-white/8 backdrop-blur-xl border border-amber-300/20 shadow-[0_8px_24px_rgba(0,0,0,0.25)] hover:border-amber-300/40 transition-colors"
         >
-          <div className="font-display font-bold text-3xl sm:text-4xl text-gradient">
+          <div className="font-display font-bold text-3xl sm:text-4xl bg-gradient-to-r from-amber-200 via-amber-100 to-amber-400 bg-clip-text text-transparent">
             <Counter to={s.value} suffix={s.suffix} />
           </div>
-          <div className="mt-1 text-xs sm:text-sm text-muted-foreground font-medium">{s.label}</div>
+          <div className="mt-1 text-xs sm:text-sm text-white/60 font-medium">{s.label}</div>
         </motion.div>
       ))}
     </div>

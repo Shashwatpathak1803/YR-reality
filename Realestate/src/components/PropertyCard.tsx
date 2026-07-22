@@ -16,11 +16,11 @@ export default function PropertyCard({ p, index }: { p: Property; index: number 
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ delay: index * 0.06 }}
-      className="group bg-card rounded-3xl overflow-hidden shadow-soft hover:shadow-elegant transition-all duration-500 hover:-translate-y-1 border border-border/60"
+      className="group bg-white rounded-3xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.06)] hover:shadow-[0_20px_50px_rgba(217,180,80,0.18)] transition-all duration-500 hover:-translate-y-1 border border-amber-100/70 hover:border-amber-300/60"
     >
-      <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+      <div className="relative aspect-[4/3] overflow-hidden bg-neutral-100">
         {p.images.length === 0 && (
-          <div className="absolute inset-0 grid place-items-center text-muted-foreground">
+          <div className="absolute inset-0 grid place-items-center text-neutral-400">
             <div className="flex flex-col items-center gap-2">
               <ImageOff className="w-8 h-8" />
               <span className="text-xs font-medium">No image</span>
@@ -40,15 +40,15 @@ export default function PropertyCard({ p, index }: { p: Property; index: number 
             }`}
           />
         ))}
-        <div className="absolute inset-0 bg-gradient-to-t from-foreground/40 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
         <div className="absolute top-3 left-3 flex gap-2">
           <span className={`px-2.5 py-1 rounded-full text-[11px] font-semibold ${
-            p.status === "Available" ? "bg-secondary text-secondary-foreground" : "bg-foreground/80 text-white"
+            p.status === "Available" ? "bg-emerald-800 text-emerald-50" : "bg-neutral-900/85 text-white"
           }`}>
             {p.status}
           </span>
-          <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold glass text-foreground">
+          <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-white/20 backdrop-blur-md border border-amber-300/30 text-white">
             {p.propertyType}
           </span>
         </div>
@@ -58,14 +58,14 @@ export default function PropertyCard({ p, index }: { p: Property; index: number 
             <button
               onClick={prev}
               aria-label="Previous image"
-              className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 grid place-items-center rounded-full glass opacity-0 group-hover:opacity-100 transition"
+              className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 grid place-items-center rounded-full bg-white/20 backdrop-blur-md border border-amber-300/30 text-white opacity-0 group-hover:opacity-100 transition"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button
               onClick={next}
               aria-label="Next image"
-              className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 grid place-items-center rounded-full glass opacity-0 group-hover:opacity-100 transition"
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 grid place-items-center rounded-full bg-white/20 backdrop-blur-md border border-amber-300/30 text-white opacity-0 group-hover:opacity-100 transition"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -76,7 +76,7 @@ export default function PropertyCard({ p, index }: { p: Property; index: number 
                   aria-label={`Go to image ${idx + 1}`}
                   onClick={() => setI(idx)}
                   className={`h-1.5 rounded-full transition-all ${
-                    idx === i ? "w-6 bg-white" : "w-1.5 bg-white/60"
+                    idx === i ? "w-6 bg-amber-400" : "w-1.5 bg-white/60"
                   }`}
                 />
               ))}
@@ -86,34 +86,36 @@ export default function PropertyCard({ p, index }: { p: Property; index: number 
       </div>
 
       <div className="p-5">
-        <h3 className="font-display font-semibold text-lg text-foreground line-clamp-1">{p.title}</h3>
-        <div className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
-          <MapPin className="w-3.5 h-3.5 text-primary" /> {p.location}
+        <h3 className="font-display font-semibold text-lg text-neutral-900 line-clamp-1">{p.title}</h3>
+        <div className="mt-1 flex items-center gap-1.5 text-sm text-neutral-500">
+          <MapPin className="w-3.5 h-3.5 text-amber-500" /> {p.location}
         </div>
 
         <div className="mt-3 flex items-end justify-between">
           <div>
-            <div className="text-xs text-muted-foreground">Starting</div>
-            <div className="font-display font-bold text-xl text-gradient">{p.price}</div>
+            <div className="text-xs text-neutral-400">Starting</div>
+            <div className="font-display font-bold text-xl bg-gradient-to-r from-amber-600 via-amber-500 to-amber-700 bg-clip-text text-transparent">
+              {p.price}
+            </div>
           </div>
           <div className="text-right">
-            <div className="text-xs text-muted-foreground flex items-center gap-1"><Ruler className="w-3 h-3" /> Area</div>
-            <div className="text-sm font-semibold">{p.area}</div>
+            <div className="text-xs text-neutral-400 flex items-center gap-1"><Ruler className="w-3 h-3" /> Area</div>
+            <div className="text-sm font-semibold text-neutral-800">{p.area}</div>
           </div>
         </div>
 
-        <p className="mt-3 text-sm text-muted-foreground line-clamp-2">{p.description}</p>
+        <p className="mt-3 text-sm text-neutral-500 line-clamp-2">{p.description}</p>
 
         <div className="mt-4 flex gap-2">
           <a
             href="#contact"
-            className="flex-1 inline-flex items-center justify-center gap-1.5 h-10 rounded-full bg-[image:var(--gradient-primary)] text-primary-foreground text-sm font-semibold hover:shadow-soft transition"
+            className="flex-1 inline-flex items-center justify-center gap-1.5 h-10 rounded-full bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 text-neutral-900 text-sm font-semibold shadow-[0_4px_16px_rgba(217,180,80,0.3)] hover:shadow-[0_6px_22px_rgba(217,180,80,0.45)] transition-all duration-300"
           >
             View Details <ArrowRight className="w-3.5 h-3.5" />
           </a>
           <a
             href={`tel:${contact.phones[0]}`}
-            className="inline-flex items-center justify-center gap-1.5 h-10 px-4 rounded-full border border-primary text-primary text-sm font-semibold hover:bg-primary hover:text-primary-foreground transition"
+            className="inline-flex items-center justify-center gap-1.5 h-10 px-4 rounded-full border border-amber-400/50 text-amber-700 text-sm font-semibold hover:bg-neutral-900 hover:text-amber-300 hover:border-neutral-900 transition-colors duration-300"
           >
             <Phone className="w-3.5 h-3.5" /> Call
           </a>

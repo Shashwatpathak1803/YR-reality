@@ -127,3 +127,15 @@
 @utility shadow-soft {
   box-shadow: var(--shadow-soft);
 }
+
+
+.swiper-pagination-bullet{
+    background:#d4af37;
+    opacity:.35;
+}
+
+.swiper-pagination-bullet-active{
+    opacity:1;
+    width:22px;
+    border-radius:999px;
+}
