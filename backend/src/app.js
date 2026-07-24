@@ -26,18 +26,7 @@ const allowedOrigins = [env.CLIENT_URL, env.ADMIN_URL];
 const isLocalOrigin = (origin) => /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (
-        !origin ||
-        allowedOrigins.includes(origin) ||
-        (env.NODE_ENV === 'development' && isLocalOrigin(origin))
-      ) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
-    credentials: true,
+    origin: "*",
   })
 );
 
@@ -72,7 +61,7 @@ app.use('/api', apiRoutes);
 app.get('/', (req, res) => {
   res.status(200).json({
     success: true,
-    message: 'Real Estate Backend API is running',
+    message: 'Real Estate Backend API is running...........',
     docs: '/api-docs',
   });
 });
