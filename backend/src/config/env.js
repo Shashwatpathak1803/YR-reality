@@ -18,7 +18,7 @@ export const env = {
   CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
   CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
 
-  SERVER_URL: process.env.SERVER_URL || `http://localhost:${process.env.PORT || 5000}`,
+  SERVER_URL: process.env.SERVER_URL || `https://yr-realty-backend.onrender.com`,
   CLIENT_URL: process.env.CLIENT_URL || 'http://localhost:3000',
   ADMIN_URL: process.env.ADMIN_URL || 'http://localhost:3001',
 
