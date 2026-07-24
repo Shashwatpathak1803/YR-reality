@@ -5,7 +5,8 @@
  */
 import { useQuery } from "@tanstack/react-query";
 
-const API_URL = "https://yr-realty-backend.onrender.com"
+const API_URL =
+  (import.meta.env.VITE_API_URL as string | undefined) ?? "http://localhost:5000/api";
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {
