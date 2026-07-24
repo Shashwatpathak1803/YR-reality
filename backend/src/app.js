@@ -17,16 +17,14 @@ import { UPLOADS_DIR } from './services/media.service.js';
 
 const app = express();
 
-// Security headers (allow /uploads images to be embedded by the website/admin origins)
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 
-// CORS: allow the public website and the admin panel
-// In development also allow any localhost/127.0.0.1 origin (vite dev servers pick free ports)
-const allowedOrigins = [env.CLIENT_URL, env.ADMIN_URL];
-const isLocalOrigin = (origin) => /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
 app.use(
   cors({
-    origin: "*",
+    origin: (origin, callback) => {
+      callback(null, true); // reflects the requesting origin back, allowing any origin
+    },
+    credentials: true,
   })
 );
 
