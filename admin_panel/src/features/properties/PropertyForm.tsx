@@ -21,9 +21,10 @@ import {
   CONSTRUCTION_STATUSES,
   PROPERTY_STATUSES,
   constructionValue,
+  PLACEHOLDER_IMG,
   type PropertyInput,
 } from "@/services";
-import { X, Upload, Loader2, Sparkles } from "lucide-react";
+import { X, Upload, Loader2, Sparkles, Locate } from "lucide-react";
 import type { Property } from "@/types";
 
 const schema = z.object({
@@ -68,6 +69,7 @@ export function PropertyForm({ mode, initial, onSaved }: Props) {
   const [amenities, setAmenities] = useState<string[]>(initial?.amenities ?? []);
   const [existingImages, setExistingImages] = useState<string[]>(initial?.images ?? []);
   const [newFiles, setNewFiles] = useState<File[]>([]);
+  const [isDetectingLocation, setIsDetectingLocation] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const { data: categories = [] } = useQuery({ queryKey: ["categories"], queryFn: categoryService.list });
@@ -110,17 +112,69 @@ const {
 
 const initializedIdRef = useRef<string | undefined>(undefined);
 
-useEffect(() => {
-  // Only reset the form the first time we see this property's data.
-  // Without this guard, every background refetch (tab focus, cache
-  // invalidation, etc.) hands us a new `initial` object reference and
-  // wipes out whatever the user has typed so far.
-  if (initial && initializedIdRef.current !== initial.id) {
-    reset(defaults);
-    setAmenities(initial.amenities ?? []);
-    initializedIdRef.current = initial.id;
-  }
-}, [initial, defaults, reset]);
+  useEffect(() => {
+    if (initial && initializedIdRef.current !== initial.id) {
+      reset(defaults);
+      setAmenities(initial.amenities ?? []);
+      setExistingImages(initial.images ?? []);
+      initializedIdRef.current = initial.id;
+    }
+  }, [initial, defaults, reset]);
+
+  const handleGetCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error("Geolocation is not supported by your browser");
+      return;
+    }
+
+    setIsDetectingLocation(true);
+    toast.info("Detecting your current location...");
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+
+        setValue("latitude", lat, { shouldValidate: true, shouldDirty: true });
+        setValue("longitude", lng, { shouldValidate: true, shouldDirty: true });
+
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+          );
+          const data = await res.json();
+          if (data && data.address) {
+            const city =
+              data.address.city ||
+              data.address.town ||
+              data.address.village ||
+              data.address.suburb ||
+              data.address.county ||
+              "";
+            const state = data.address.state || "";
+            const locStr = [city, state].filter(Boolean).join(", ");
+            if (locStr) {
+              setValue("location", locStr, { shouldValidate: true, shouldDirty: true });
+            }
+
+            if (data.display_name) {
+              setValue("address", data.display_name, { shouldValidate: true, shouldDirty: true });
+            }
+          }
+          toast.success("Location fetched & fields populated!");
+        } catch {
+          toast.success(`Coordinates set: ${lat.toFixed(4)}, ${lng.toFixed(4)}`);
+        } finally {
+          setIsDetectingLocation(false);
+        }
+      },
+      (err) => {
+        setIsDetectingLocation(false);
+        toast.error(`Location access denied or failed: ${err.message}`);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
 
   const toggleAmenity = (a: string) => setAmenities(s => s.includes(a) ? s.filter(x => x !== a) : [...s, a]);
 
@@ -261,8 +315,23 @@ useEffect(() => {
           </Card>
 
           <Card className="card-elevated">
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="font-display">Location</CardTitle>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleGetCurrentLocation}
+                disabled={isDetectingLocation}
+                className="text-xs gap-1.5"
+              >
+                {isDetectingLocation ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
+                ) : (
+                  <Locate className="h-3.5 w-3.5 text-primary" />
+                )}
+                {isDetectingLocation ? "Detecting..." : "Detect Current Location"}
+              </Button>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -370,7 +439,7 @@ useEffect(() => {
                   <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
                     {existingImages.map((src, i) => (
                       <div key={i} className="group relative aspect-square rounded-lg overflow-hidden border border-border">
-                        <img src={src} alt="" className="h-full w-full object-cover" />
+                        <img src={src} onError={(e) => { (e.currentTarget as HTMLImageElement).src = PLACEHOLDER_IMG; }} alt="" className="h-full w-full object-cover" />
                         <button type="button" onClick={() => removeExistingImage(i)} className="absolute top-1 right-1 grid h-6 w-6 place-items-center rounded-full bg-background/90 text-destructive opacity-0 group-hover:opacity-100 transition-opacity">
                           <X className="h-3 w-3" />
                         </button>

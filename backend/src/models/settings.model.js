@@ -25,11 +25,19 @@ const settingsSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Singleton pattern: only ever one settings document
 settingsSchema.statics.getSingleton = async function getSingleton() {
   let settings = await this.findOne();
   if (!settings) {
-    settings = await this.create({});
+    settings = await this.create({
+      companyName: 'YR Realty',
+      phoneNumbers: ['+91 99714 05532'],
+      email: 'yrrealty9123@gmail.com',
+      whatsapp: '919971405532',
+    });
+  } else {
+    settings.whatsapp = '919971405532';
+    settings.phoneNumbers = ['+91 99714 05532'];
+    await settings.save();
   }
   return settings;
 };

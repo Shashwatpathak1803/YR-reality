@@ -1,13 +1,14 @@
 import { motion } from "framer-motion";
-import { Phone, Mail, MapPin, Send, Loader2 } from "lucide-react";
+import { Phone, Mail, MapPin, Send, Loader2, MessageCircle } from "lucide-react";
 import { useState } from "react";
-import { submitEnquiry, trackContactClick, useContactInfo } from "@/lib/api";
+import { formatWhatsAppUrl, submitEnquiry, TARGET_WHATSAPP_NUMBER, trackContactClick, useContactInfo } from "@/lib/api";
 
 export default function Contact() {
   const contact = useContactInfo();
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
+  const [waUrl, setWaUrl] = useState("");
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -17,11 +18,31 @@ export default function Contact() {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    if (!name.trim() || !phone.trim()) {
-      setError("Please fill your name and phone number.");
+    if (!name.trim()) {
+      setError("Please fill your name.");
+      return;
+    }
+    if (!phone.trim()) {
+      setError("Please fill your phone number.");
+      return;
+    }
+    if (!/^[6-9]\d{9}$/.test(phone.trim())) {
+      setError("Please enter a valid 10-digit mobile number.");
       return;
     }
     setSending(true);
+
+    const waText =
+      `🚨 *New Property Enquiry - YR Realty*\n\n` +
+      `👤 *Name:* ${name.trim()}\n` +
+      `📞 *Phone:* ${phone.trim()}\n` +
+      (email.trim() ? `✉️ *Email:* ${email.trim()}\n` : "") +
+      (message.trim() ? `💬 *Message:* ${message.trim()}\n` : "") +
+      `📍 *Source:* Website Contact Form`;
+
+    const generatedWaUrl = formatWhatsAppUrl(waText, contact.whatsapp || TARGET_WHATSAPP_NUMBER);
+    setWaUrl(generatedWaUrl);
+
     try {
       await submitEnquiry({
         name: name.trim(),
@@ -31,6 +52,7 @@ export default function Contact() {
         sourcePage: "contact",
       });
       setSent(true);
+      window.open(generatedWaUrl, "_blank", "noopener,noreferrer");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
     } finally {
@@ -86,7 +108,7 @@ export default function Contact() {
 
             <div className="mt-8 space-y-5 relative">
  <a
-  href="tel:+919876543210"
+  href={`tel:${contact.phones[0] || "+919971405532"}`}
   onClick={() => trackContactClick("call")}
   className="flex items-start gap-3 group"
 >
@@ -97,7 +119,7 @@ export default function Contact() {
   <div>
     <div className="text-xs text-white/50">Call us</div>
     <div className="font-semibold group-hover:text-amber-300 group-hover:underline transition-colors">
-      +91 99714 05532
+      {contact.phones[0] || "+91 99714 05532"}
     </div>
   </div>
 </a>
@@ -156,12 +178,30 @@ export default function Contact() {
                 <p className="mt-1 text-sm text-neutral-500">
                   Thank you {name.split(" ")[0]}! Our team will reach out to you shortly.
                 </p>
+                {waUrl && (
+                  <a
+                    href={waUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-5 inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm shadow-md transition-all"
+                  >
+                    <MessageCircle className="w-4 h-4" /> Send Details on WhatsApp ({contact.whatsapp})
+                  </a>
+                )}
               </div>
             ) : (
               <>
                 <div className="mt-6 grid sm:grid-cols-2 gap-4">
                   <Field label="Name" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} required />
-                  <Field label="Phone" placeholder="+91 ..." type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} required />
+                  <Field
+                    label="Phone"
+                    placeholder="10-digit mobile number"
+                    type="tel"
+                    maxLength={10}
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                    required
+                  />
                   <div className="sm:col-span-2">
                     <Field label="Email" placeholder="you@example.com" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
                   </div>

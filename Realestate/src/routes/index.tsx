@@ -13,6 +13,7 @@ import SiteVisitForm from "@/components/SiteVisitForm";
 import SiteVisitPopup from "@/components/SiteVisitPopup";
 import Footer from "@/components/Footer";
 import FloatingButtons from "@/components/FloatingButtons";
+import LiveBot from "@/components/LiveBot";
 import { DEFAULT_CONTACT, getContactInfoSnapshot } from "@/lib/api";
 import { SearchFilterProvider } from "@/lib/search-filter";
 
@@ -91,6 +92,7 @@ function Index() {
         </main>
         <Footer />
         <FloatingButtons />
+        <LiveBot />
         <SiteVisitPopup />
       </div>
     </SearchFilterProvider>

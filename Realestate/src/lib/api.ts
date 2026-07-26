@@ -167,7 +167,7 @@ export function useGalleryImages() {
       const mediaUrls = media
         .filter((m) => (m.resourceType ?? "image") === "image")
         .map((m) => m.url);
-      const propertyUrls = props.flatMap((p) => (p.images ?? []).map((m) => m.url));
+      const propertyUrls = props.flatMap((p) => (p.images ?? []).map((m) => m?.url));
       return [...new Set([...mediaUrls, ...propertyUrls].filter(Boolean))] as string[];
     },
     ...contentQuery,
@@ -177,14 +177,21 @@ export function useGalleryImages() {
 // ---------------------------------------------------------------------------
 // Contact info helper — backend settings with sensible defaults
 // ---------------------------------------------------------------------------
+export const TARGET_WHATSAPP_NUMBER = "919971405532";
+
 export const DEFAULT_CONTACT = {
   companyName: "YR Realty",
-  phones: [] as string[],
-  email: "",
+  phones: ["+91 99714 05532"],
+  email: "yrrealty9123@gmail.com",
   address: "Delhi NCR",
-  whatsapp: "",
+  whatsapp: TARGET_WHATSAPP_NUMBER,
   socialLinks: {} as NonNullable<ApiSettings["socialLinks"]>,
 };
+
+export function formatWhatsAppUrl(text: string, number: string = TARGET_WHATSAPP_NUMBER) {
+  const cleanNum = number.replace(/[^\d]/g, "") || TARGET_WHATSAPP_NUMBER;
+  return `https://wa.me/${cleanNum}?text=${encodeURIComponent(text)}`;
+}
 
 function normalizeContactInfo(data?: ApiSettings) {
   const phones = data?.phoneNumbers?.filter(Boolean) ?? [];
@@ -193,7 +200,7 @@ function normalizeContactInfo(data?: ApiSettings) {
     phones: phones.length ? phones : DEFAULT_CONTACT.phones,
     email: data?.email || DEFAULT_CONTACT.email,
     address: data?.address || DEFAULT_CONTACT.address,
-    whatsapp: (data?.whatsapp || DEFAULT_CONTACT.whatsapp).replace(/[^\d]/g, ""),
+    whatsapp: (data?.whatsapp || DEFAULT_CONTACT.whatsapp).replace(/[^\d]/g, "") || TARGET_WHATSAPP_NUMBER,
     googleMap: data?.googleMap || "",
     socialLinks: data?.socialLinks ?? DEFAULT_CONTACT.socialLinks,
   };

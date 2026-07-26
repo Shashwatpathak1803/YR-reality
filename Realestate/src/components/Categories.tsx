@@ -1,21 +1,16 @@
 import { motion } from "framer-motion";
-import { Home, Building2, Building, Trees, Warehouse, LandPlot, TrendingUp } from "lucide-react";
-import { useCategories } from "@/lib/api";
+import { Home, Building2, Building, Trees, Warehouse, LandPlot, TrendingUp, ChevronRight } from "lucide-react";
+import { useCategories, useAllProperties } from "@/lib/api";
+import { ANY, useSearchFilter } from "@/lib/search-filter";
 
-// Tones kept entirely within the gold family (rather than a rainbow per category)
-// so this grid stays on-brand instead of looking like a different site's icon set.
 const fallbackCats = [
-  { icon: LandPlot, label: "Residential Plots", tone: "from-amber-400 to-amber-600" },
-  { icon: Building2, label: "Commercial Plots", tone: "from-yellow-500 to-amber-600" },
-  { icon: Building, label: "Luxury Flats", tone: "from-amber-300 to-yellow-600" },
-  { icon: Home, label: "Apartments", tone: "from-amber-500 to-orange-500" },
-  { icon: Trees, label: "Farm Houses", tone: "from-yellow-400 to-amber-500" },
-  { icon: Warehouse, label: "Villas", tone: "from-amber-600 to-yellow-700" },
-  { icon: TrendingUp, label: "Investment", tone: "from-orange-400 to-amber-600" },
+  { slug: "residential-plots", name: "Residential Plots", tone: "from-amber-400 to-amber-600", desc: "Approved plots for your dream house" },
+  { slug: "commercial-plots", name: "Commercial Plots", tone: "from-yellow-500 to-amber-600", desc: "Prime land for shops & offices" },
+  { slug: "luxury-villas", name: "Luxury Villas", tone: "from-amber-500 to-orange-500", desc: "Independent high-end homes" },
+  { slug: "apartments", name: "Flats & Apartments", tone: "from-amber-300 to-yellow-600", desc: "2 & 3 BHK modern apartments" },
+  { slug: "farm-houses", name: "Farm Houses", tone: "from-yellow-400 to-amber-500", desc: "Green farmhouses & estates" },
+  { slug: "investment", name: "High ROI Projects", tone: "from-orange-400 to-amber-600", desc: "Top growth locations in Delhi NCR" },
 ];
-
-const ICONS = [LandPlot, Building2, Building, Home, Trees, Warehouse, TrendingUp];
-const TONES = fallbackCats.map((c) => c.tone);
 
 function iconFor(slug: string, i: number) {
   if (slug.includes("plot") || slug.includes("land")) return LandPlot;
@@ -23,24 +18,54 @@ function iconFor(slug: string, i: number) {
   if (slug.includes("flat") || slug.includes("apartment")) return Building;
   if (slug.includes("farm")) return Trees;
   if (slug.includes("villa") || slug.includes("house")) return Warehouse;
-  if (slug.includes("invest")) return TrendingUp;
-  return ICONS[i % ICONS.length];
+  return TrendingUp;
 }
 
 export default function Categories() {
-  const { data } = useCategories();
-  const cats = (data ?? []).map((c, i) => ({
-    icon: iconFor(c.slug, i),
-    label: c.name,
-    tone: TONES[i % TONES.length],
-  }));
+  const { data: apiCats } = useCategories();
+  const { data: allProperties } = useAllProperties();
+  const { setFilter } = useSearchFilter();
 
-  // No categories added in the admin panel yet — hide the section instead of showing demo content
-  if (!cats.length) return null;
+  const cats = (apiCats?.length ? apiCats : fallbackCats).map((c, i) => {
+    const icon = iconFor(c.slug || c.name.toLowerCase(), i);
+    const fallback = fallbackCats[i % fallbackCats.length];
+    const count = (allProperties ?? []).filter((p) => {
+      const catName = p.category && typeof p.category === "object" ? p.category.name : (p.category ?? "");
+      const haystack = `${catName} ${p.title} ${p.shortDescription ?? ""} ${p.description ?? ""}`.toLowerCase()
+        .replace(/houses/g, "house")
+        .replace(/plots/g, "plot")
+        .replace(/villas/g, "villa")
+        .replace(/apartments/g, "apartment")
+        .replace(/flats/g, "flat");
+
+      const normName = (c.name || c.slug || "").toLowerCase()
+        .replace(/houses/g, "house")
+        .replace(/plots/g, "plot")
+        .replace(/villas/g, "villa")
+        .replace(/apartments/g, "apartment")
+        .replace(/flats/g, "flat");
+
+      const keywords = normName.split(/[\s&,/]+/).filter((w) => w.length > 2 && w !== "and" && w !== "projects" && w !== "high" && w !== "roi");
+      return keywords.length > 0 ? keywords.every((kw) => haystack.includes(kw)) : haystack.includes(normName);
+    }).length;
+
+    return {
+      name: c.name || fallback.name,
+      desc: fallback.desc,
+      icon,
+      tone: fallback.tone,
+      count: count > 0 ? `${count}+ Properties` : "Verified Listings",
+    };
+  });
+
+  const handleSelectCategory = (catName: string) => {
+    setFilter({ type: catName, location: ANY, budget: ANY });
+    document.getElementById("properties")?.scrollIntoView({ behavior: "smooth" });
+  };
 
   return (
-    <section className="py-20 bg-neutral-50 relative overflow-hidden">
-      {/* Faint blueprint grid, matching every other section */}
+    <section className="py-20 bg-neutral-900 text-white relative overflow-hidden">
+      {/* Blueprint grid background texture */}
       <div
         className="absolute inset-0 opacity-[0.035] pointer-events-none"
         style={{
@@ -55,37 +80,59 @@ export default function Categories() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center max-w-2xl mx-auto mb-12"
+          className="text-center max-w-2xl mx-auto mb-14"
         >
-          <div className="inline-flex px-3 py-1 rounded-full border border-amber-300/50 bg-amber-50 text-amber-800 text-xs font-semibold tracking-[0.15em]">
-            EXPLORE CATEGORIES
+          <div className="inline-flex px-3.5 py-1.5 rounded-full border border-amber-400/40 bg-amber-400/10 text-amber-300 text-xs font-bold tracking-widest uppercase">
+            EXPLORE PROPERTY CATEGORIES
           </div>
-          <h2 className="mt-4 font-display font-bold text-3xl sm:text-5xl text-neutral-900">
-            A property for{" "}
-            <span className="bg-gradient-to-r from-amber-600 via-amber-500 to-amber-700 bg-clip-text text-transparent">
-              every ambition
+          <h2 className="mt-4 font-display font-extrabold text-3xl sm:text-5xl">
+            Find Exactly What You Are Looking For in{" "}
+            <span className="bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 bg-clip-text text-transparent">
+              Delhi NCR
             </span>
           </h2>
-          <div className="w-16 h-px bg-amber-400/70 mx-auto mt-5" />
+          <p className="mt-4 text-sm sm:text-base text-neutral-400">
+            Select a category below to instantly filter verified residential plots, luxury villas, commercial land, and apartments.
+          </p>
         </motion.div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {cats.map((c, i) => (
-            <motion.a
-              key={c.label}
-              href="#properties"
-              initial={{ opacity: 0, y: 20 }}
+            <motion.div
+              key={c.name}
+              initial={{ opacity: 0, y: 25 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.05 }}
+              transition={{ delay: i * 0.06 }}
               whileHover={{ y: -6 }}
-              className="group relative bg-white rounded-2xl p-5 text-center shadow-[0_4px_16px_rgba(0,0,0,0.05)] border border-amber-100/70 hover:border-amber-300/60 hover:shadow-[0_16px_40px_rgba(217,180,80,0.18)] transition-all"
+              onClick={() => handleSelectCategory(c.name)}
+              className="cursor-pointer group relative bg-gradient-to-b from-neutral-950 via-neutral-900 to-neutral-950 rounded-3xl p-6 border border-amber-400/30 hover:border-amber-400/90 shadow-[0_15px_35px_rgba(0,0,0,0.6)] hover:shadow-[0_20px_50px_rgba(217,180,80,0.25)] transition-all duration-300 overflow-hidden flex flex-col justify-between"
             >
-              <div className={`w-12 h-12 mx-auto rounded-xl bg-gradient-to-br ${c.tone} grid place-items-center shadow-[0_6px_16px_rgba(217,180,80,0.3)] group-hover:scale-110 transition-transform`}>
-                <c.icon className="w-6 h-6 text-neutral-900" />
+              <div className="absolute top-0 right-0 w-32 h-32 bg-amber-400/5 rounded-full blur-2xl group-hover:bg-amber-400/15 transition-all" />
+
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${c.tone} grid place-items-center shadow-lg group-hover:scale-110 transition-transform`}>
+                    <c.icon className="w-7 h-7 text-neutral-950" />
+                  </div>
+                  <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-white/10 text-amber-300 border border-amber-400/30">
+                    {c.count}
+                  </span>
+                </div>
+
+                <h3 className="font-display font-bold text-xl text-white group-hover:text-amber-300 transition-colors">
+                  {c.name}
+                </h3>
+                <p className="mt-2 text-xs text-neutral-400 leading-relaxed">
+                  {c.desc}
+                </p>
               </div>
-              <div className="mt-3 text-sm font-semibold text-neutral-800">{c.label}</div>
-            </motion.a>
+
+              <div className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between text-xs font-semibold text-amber-400 group-hover:translate-x-1 transition-transform">
+                <span>Browse Options</span>
+                <ChevronRight className="w-4 h-4" />
+              </div>
+            </motion.div>
           ))}
         </div>
       </div>

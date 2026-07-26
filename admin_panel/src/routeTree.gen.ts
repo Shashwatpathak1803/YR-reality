@@ -28,7 +28,7 @@ import { Route as AdminTestimonialsRouteImport } from './routes/_admin.testimoni
 import { Route as AdminPropertiesIndexRouteImport } from './routes/_admin.properties.index'
 import { Route as AdminPropertiesIdRouteImport } from './routes/_admin.properties.$id'
 import { Route as AdminPropertiesNewRouteImport } from './routes/_admin.properties.new'
-import { Route as AdminPropertiesIdEditRouteImport } from './routes/_admin.properties.$id.edit'
+import { Route as AdminPropertiesIdEditRouteImport } from './routes/_admin.properties.$id_.edit'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -125,9 +125,9 @@ const AdminPropertiesNewRoute = AdminPropertiesNewRouteImport.update({
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminPropertiesIdEditRoute = AdminPropertiesIdEditRouteImport.update({
-  id: '/edit',
-  path: '/edit',
-  getParentRoute: () => AdminPropertiesIdRoute,
+  id: '/properties/$id_/edit',
+  path: '/properties/$id/edit',
+  getParentRoute: () => AdminRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -146,7 +146,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AdminSettingsRoute
   '/site-visits': typeof AdminSiteVisitsRoute
   '/testimonials': typeof AdminTestimonialsRoute
-  '/properties/$id': typeof AdminPropertiesIdRouteWithChildren
+  '/properties/$id': typeof AdminPropertiesIdRoute
   '/properties/new': typeof AdminPropertiesNewRoute
   '/properties/': typeof AdminPropertiesIndexRoute
   '/properties/$id/edit': typeof AdminPropertiesIdEditRoute
@@ -167,7 +167,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AdminSettingsRoute
   '/site-visits': typeof AdminSiteVisitsRoute
   '/testimonials': typeof AdminTestimonialsRoute
-  '/properties/$id': typeof AdminPropertiesIdRouteWithChildren
+  '/properties/$id': typeof AdminPropertiesIdRoute
   '/properties/new': typeof AdminPropertiesNewRoute
   '/properties': typeof AdminPropertiesIndexRoute
   '/properties/$id/edit': typeof AdminPropertiesIdEditRoute
@@ -190,10 +190,10 @@ export interface FileRoutesById {
   '/_admin/settings': typeof AdminSettingsRoute
   '/_admin/site-visits': typeof AdminSiteVisitsRoute
   '/_admin/testimonials': typeof AdminTestimonialsRoute
-  '/_admin/properties/$id': typeof AdminPropertiesIdRouteWithChildren
+  '/_admin/properties/$id': typeof AdminPropertiesIdRoute
   '/_admin/properties/new': typeof AdminPropertiesNewRoute
   '/_admin/properties/': typeof AdminPropertiesIndexRoute
-  '/_admin/properties/$id/edit': typeof AdminPropertiesIdEditRoute
+  '/_admin/properties/$id_/edit': typeof AdminPropertiesIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -259,7 +259,7 @@ export interface FileRouteTypes {
     | '/_admin/properties/$id'
     | '/_admin/properties/new'
     | '/_admin/properties/'
-    | '/_admin/properties/$id/edit'
+    | '/_admin/properties/$id_/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -404,26 +404,15 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPropertiesNewRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/_admin/properties/$id/edit': {
-      id: '/_admin/properties/$id/edit'
-      path: '/edit'
+    '/_admin/properties/$id_/edit': {
+      id: '/_admin/properties/$id_/edit'
+      path: '/properties/$id/edit'
       fullPath: '/properties/$id/edit'
       preLoaderRoute: typeof AdminPropertiesIdEditRouteImport
-      parentRoute: typeof AdminPropertiesIdRoute
+      parentRoute: typeof AdminRoute
     }
   }
 }
-
-interface AdminPropertiesIdRouteChildren {
-  AdminPropertiesIdEditRoute: typeof AdminPropertiesIdEditRoute
-}
-
-const AdminPropertiesIdRouteChildren: AdminPropertiesIdRouteChildren = {
-  AdminPropertiesIdEditRoute: AdminPropertiesIdEditRoute,
-}
-
-const AdminPropertiesIdRouteWithChildren =
-  AdminPropertiesIdRoute._addFileChildren(AdminPropertiesIdRouteChildren)
 
 interface AdminRouteChildren {
   AdminBlogsRoute: typeof AdminBlogsRoute
@@ -438,9 +427,10 @@ interface AdminRouteChildren {
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminSiteVisitsRoute: typeof AdminSiteVisitsRoute
   AdminTestimonialsRoute: typeof AdminTestimonialsRoute
-  AdminPropertiesIdRoute: typeof AdminPropertiesIdRouteWithChildren
+  AdminPropertiesIdRoute: typeof AdminPropertiesIdRoute
   AdminPropertiesNewRoute: typeof AdminPropertiesNewRoute
   AdminPropertiesIndexRoute: typeof AdminPropertiesIndexRoute
+  AdminPropertiesIdEditRoute: typeof AdminPropertiesIdEditRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
@@ -456,9 +446,10 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminSettingsRoute: AdminSettingsRoute,
   AdminSiteVisitsRoute: AdminSiteVisitsRoute,
   AdminTestimonialsRoute: AdminTestimonialsRoute,
-  AdminPropertiesIdRoute: AdminPropertiesIdRouteWithChildren,
+  AdminPropertiesIdRoute: AdminPropertiesIdRoute,
   AdminPropertiesNewRoute: AdminPropertiesNewRoute,
   AdminPropertiesIndexRoute: AdminPropertiesIndexRoute,
+  AdminPropertiesIdEditRoute: AdminPropertiesIdEditRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)

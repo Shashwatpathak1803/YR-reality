@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YR Realty — You're Offline</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      background: #0a0a0a;
+      color: #fff;
+      font-family: 'Inter', system-ui, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+    }
+    .logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #D4AF37, #F59E0B);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      font-size: 2rem;
+      font-weight: 900;
+      color: #0a0a0a;
+    }
+    h1 { font-size: 1.75rem; font-weight: 800; margin-bottom: 0.75rem; }
+    p { color: rgba(255,255,255,0.6); line-height: 1.6; max-width: 340px; margin: 0 auto 2rem; }
+    .badge {
+      display: inline-block;
+      background: rgba(212,175,55,0.15);
+      border: 1px solid rgba(212,175,55,0.4);
+      color: #D4AF37;
+      padding: 0.5rem 1.25rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 2rem;
+    }
+    button {
+      background: linear-gradient(135deg, #D4AF37, #F59E0B);
+      color: #0a0a0a;
+      font-weight: 700;
+      border: none;
+      padding: 0.875rem 2rem;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    button:hover { transform: scale(1.04); }
+    .wa-link {
+      margin-top: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #22c55e;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .wa-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="logo">YR</div>
+  <div class="badge">📶 No Internet Connection</div>
+  <h1>You're Offline</h1>
+  <p>It looks like you've lost your internet connection. Some cached pages may still work — try navigating back or reconnect and refresh.</p>
+  <button onclick="window.location.reload()">🔄 Try Again</button>
+  <a class="wa-link" href="https://wa.me/919971405532?text=Hello%20YR%20Realty!%20I%20need%20property%20help." target="_blank">
+    💬 WhatsApp us: +91 9971405532
+  </a>
+</body>
+</html>

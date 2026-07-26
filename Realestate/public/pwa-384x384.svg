@@ -1,0 +1,16 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='384' height='384' viewBox='0 0 384 384'>
+  <defs>
+    <linearGradient id='bg' x1='0' y1='0' x2='1' y2='1'>
+      <stop offset='0%' stop-color='#1a1a1a'/>
+      <stop offset='100%' stop-color='#0a0a0a'/>
+    </linearGradient>
+    <linearGradient id='gold' x1='0' y1='0' x2='1' y2='1'>
+      <stop offset='0%' stop-color='#F59E0B'/>
+      <stop offset='100%' stop-color='#D4AF37'/>
+    </linearGradient>
+  </defs>
+  <rect width='384' height='384' rx='84' ry='84' fill='url(#bg)'/>
+  <rect width='384' height='384' rx='84' ry='84' fill='none' stroke='url(#gold)' stroke-width='9'/>
+  <text x='192' y='180' text-anchor='middle' dominant-baseline='middle' font-family='Arial Black, Arial' font-weight='900' font-size='161' fill='url(#gold)'>YR</text>
+  <text x='192' y='291' text-anchor='middle' dominant-baseline='middle' font-family='Arial, sans-serif' font-weight='700' font-size='49' fill='rgba(212,175,55,0.75)' letter-spacing='3'>REALTY</text>
+</svg>

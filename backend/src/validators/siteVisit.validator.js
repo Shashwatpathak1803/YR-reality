@@ -2,7 +2,10 @@ import { body, param } from 'express-validator';
 
 export const createSiteVisitValidator = [
   body('name').trim().notEmpty().withMessage('Name is required'),
-  body('phone').trim().notEmpty().withMessage('Phone is required'),
+  body('phone')
+    .trim()
+    .notEmpty().withMessage('Phone is required')
+    .matches(/^[6-9]\d{9}$/).withMessage('Please provide a valid 10-digit mobile number'),
   body('preferredDate').isISO8601().withMessage('Valid preferred date is required'),
   body('preferredTime').trim().notEmpty().withMessage('Preferred time is required'),
   body('property').optional().isMongoId(),

@@ -17,7 +17,8 @@ import { LogOut, Building2 } from "lucide-react";
 import { logout } from "@/services/auth";
 import { useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { enquiryService } from "@/services";
+import { enquiryService, visitService } from "@/services";
+import type { Enquiry, SiteVisit } from "@/types";
 import { toast } from "sonner";
 import logo from "@/assets/logoyr.png";
 
@@ -27,13 +28,21 @@ export function AppSidebar() {
   const pathname = useRouterState({ select: (r) => r.location.pathname });
   const navigate = useNavigate();
 
-  // Live count of unactioned enquiries — shares the cache with the Enquiries page
+  // Live count of unactioned enquiries & site visits
   const { data: enquiries } = useQuery({
     queryKey: ["enquiries"],
     queryFn: enquiryService.list,
-    refetchInterval: 60_000,
+    refetchInterval: 15_000,
   });
-  const newEnquiries = (enquiries ?? []).filter((e) => e.status === "New").length;
+
+  const { data: visits } = useQuery({
+    queryKey: ["site-visits"],
+    queryFn: visitService.list,
+    refetchInterval: 15_000,
+  });
+
+  const newEnquiries = (enquiries ?? []).filter((e: Enquiry) => e.status === "New").length;
+  const newVisits = (visits ?? []).filter((v: SiteVisit) => v.status === "Pending" || v.status === "Approved").length;
 
   const handleLogout = () => {
     logout();
@@ -88,6 +97,11 @@ export function AppSidebar() {
                             {item.to === "/enquiries" && newEnquiries > 0 && (
                               <Badge className="bg-gold text-gold-foreground hover:bg-gold h-5 px-1.5 text-[10px]">
                                 {newEnquiries}
+                              </Badge>
+                            )}
+                            {item.to === "/site-visits" && newVisits > 0 && (
+                              <Badge className="bg-primary text-primary-foreground h-5 px-1.5 text-[10px]">
+                                {newVisits}
                               </Badge>
                             )}
                           </>

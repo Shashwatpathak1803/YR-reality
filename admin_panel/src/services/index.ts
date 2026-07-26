@@ -207,7 +207,7 @@ const refId = (ref?: { _id?: string } | string | null) =>
   ref ? (typeof ref === "object" ? (ref._id ?? "") : ref) : "";
 
 const mapProperty = (p: BProperty): Property => {
-  const images = (p.images ?? []).map((m) => m.url).filter(Boolean) as string[];
+  const images = (p.images ?? []).map((m) => m?.url).filter(Boolean) as string[];
   const category =
     p.category && typeof p.category === "object" ? p.category.name : "—";
   return {

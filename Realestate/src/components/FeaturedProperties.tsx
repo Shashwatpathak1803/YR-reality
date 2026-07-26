@@ -5,7 +5,7 @@ import { ANY, BUDGET_RANGES, useSearchFilter } from "@/lib/search-filter";
 import PropertyCard from "./PropertyCard";
 
 function mapApiProperty(p: ApiProperty): Property {
-  const images = (p.images ?? []).map((m) => m.url).filter(Boolean) as string[];
+  const images = (p.images ?? []).map((m) => m?.url).filter(Boolean) as string[];
   return {
     id: p._id,
     title: p.title,
@@ -25,19 +25,50 @@ function matchesFilter(
   p: ApiProperty,
   filter: { type: string; location: string; budget: string },
 ): boolean {
-  if (filter.type !== ANY) {
-    const category = p.category && typeof p.category === "object" ? p.category.name : "";
-    const haystack = `${category} ${p.title}`.toLowerCase();
-    if (!haystack.includes(filter.type.toLowerCase())) return false;
+  const isAnyType = !filter.type || filter.type === ANY || filter.type === "ANY";
+  const isAnyLoc = !filter.location || filter.location === ANY || filter.location === "ANY";
+  const isAnyBudget = !filter.budget || filter.budget === ANY || filter.budget === "ANY";
+
+  if (!isAnyType) {
+    const categoryName = p.category && typeof p.category === "object" ? p.category.name : (p.category ?? "");
+    const haystack = `${categoryName} ${p.title} ${p.shortDescription ?? ""} ${p.description ?? ""}`.toLowerCase();
+    
+    const filterLower = filter.type.toLowerCase();
+    const normFilter = filterLower
+      .replace(/houses/g, "house")
+      .replace(/plots/g, "plot")
+      .replace(/villas/g, "villa")
+      .replace(/apartments/g, "apartment")
+      .replace(/flats/g, "flat");
+
+    const normHaystack = haystack
+      .replace(/houses/g, "house")
+      .replace(/plots/g, "plot")
+      .replace(/villas/g, "villa")
+      .replace(/apartments/g, "apartment")
+      .replace(/flats/g, "flat");
+
+    const keywords = normFilter
+      .split(/[\s&,/]+/)
+      .filter((w) => w.length > 2 && w !== "and" && w !== "projects" && w !== "high" && w !== "roi");
+
+    const matchesKeyword = keywords.length > 0
+      ? keywords.every((kw) => normHaystack.includes(kw))
+      : normHaystack.includes(normFilter);
+
+    if (!matchesKeyword) return false;
   }
-  if (filter.location !== ANY) {
+
+  if (!isAnyLoc) {
     if (!(p.location ?? "").toLowerCase().includes(filter.location.toLowerCase())) return false;
   }
-  if (filter.budget !== ANY && BUDGET_RANGES[filter.budget]) {
+
+  if (!isAnyBudget && BUDGET_RANGES[filter.budget]) {
     const [min, max] = BUDGET_RANGES[filter.budget];
     const price = p.discountPrice ?? p.price;
     if (price < min || price > max) return false;
   }
+
   return true;
 }
 
@@ -47,7 +78,11 @@ export default function FeaturedProperties() {
   const { data: all } = useAllProperties();
 
   // With an active hero search, filter across ALL projects; otherwise show featured
-  const searching = !!filter && (filter.type !== ANY || filter.location !== ANY || filter.budget !== ANY);
+  const isAnyType = !filter?.type || filter.type === ANY || filter.type === "ANY";
+  const isAnyLoc = !filter?.location || filter.location === ANY || filter.location === "ANY";
+  const isAnyBudget = !filter?.budget || filter.budget === ANY || filter.budget === "ANY";
+
+  const searching = !!filter && (!isAnyType || !isAnyLoc || !isAnyBudget);
   const source = searching ? (all ?? []).filter((p) => matchesFilter(p, filter!)) : (featured ?? []);
   const properties = source.map(mapApiProperty);
 

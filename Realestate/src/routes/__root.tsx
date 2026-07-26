@@ -11,6 +11,28 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import InstallPrompt from "../components/InstallPrompt";
+
+/** Register the YR Realty service worker */
+function useServiceWorker() {
+  useEffect(() => {
+    if ("serviceWorker" in navigator) {
+      const registerSW = () => {
+        navigator.serviceWorker
+          .register("/sw.js", { scope: "/" })
+          .then((reg) => console.log("[YR SW] registered", reg.scope))
+          .catch((err) => console.warn("[YR SW] registration failed", err));
+      };
+
+      if (document.readyState === "complete") {
+        registerSW();
+      } else {
+        window.addEventListener("load", registerSW);
+        return () => window.removeEventListener("load", registerSW);
+      }
+    }
+  }, []);
+}
 
 function NotFoundComponent() {
   return (
@@ -77,23 +99,34 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "YR Realty — Premium Plots & Luxury Homes in Delhi NCR" },
+      { name: "description", content: "Find RERA-verified plots, villas & apartments across Delhi NCR with zero brokerage. Direct builder deals, free site visits & instant WhatsApp support." },
+      { name: "author", content: "YR Realty" },
+      // PWA
+      { name: "theme-color", content: "#D4AF37" },
+      { name: "mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+      { name: "apple-mobile-web-app-title", content: "YR Realty" },
+      { name: "msapplication-TileColor", content: "#D4AF37" },
+      { name: "msapplication-TileImage", content: "/pwa-144x144.svg" },
+      // OG
+      { property: "og:title", content: "YR Realty — Premium Plots & Luxury Homes Delhi NCR" },
+      { property: "og:description", content: "100% RERA Verified. Zero Brokerage. Free Site Visits. Find your dream property." },
       { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "YR Realty" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "YR Realty" },
+      { name: "twitter:description", content: "Find Premium Plots & Luxury Homes Across Delhi NCR" },
     ],
     links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
+      { rel: "stylesheet", href: appCss },
+      { rel: "manifest", href: "/manifest.json" },
       { rel: "icon", href: "/favicon.ico?v=2", type: "image/x-icon" },
       { rel: "shortcut icon", href: "/favicon.ico?v=2", type: "image/x-icon" },
-      { rel: "apple-touch-icon", href: "/logoyr.png?v=2" },
+      { rel: "apple-touch-icon", href: "/pwa-192x192.svg" },
+      { rel: "apple-touch-icon", sizes: "152x152", href: "/pwa-152x152.svg" },
+      { rel: "apple-touch-icon", sizes: "144x144", href: "/pwa-144x144.svg" },
     ],
   }),
   shellComponent: RootShell,
@@ -118,11 +151,14 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  useServiceWorker();
 
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
+      {/* PWA Install Prompt */}
+      <InstallPrompt />
     </QueryClientProvider>
   );
 }
