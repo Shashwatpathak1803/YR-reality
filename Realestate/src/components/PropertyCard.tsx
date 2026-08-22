@@ -4,6 +4,15 @@ import { ChevronLeft, ChevronRight, MapPin, Ruler, Phone, ArrowRight, ImageOff, 
 import type { Property } from "@/data/properties";
 import { formatWhatsAppUrl, TARGET_WHATSAPP_NUMBER, useContactInfo } from "@/lib/api";
 
+function parsePriceToNumber(priceStr: string): number {
+  const clean = priceStr.replace(/[^0-9.]/g, "");
+  const num = parseFloat(clean);
+  if (isNaN(num)) return 8000000;
+  if (/cr/i.test(priceStr)) return Math.round(num * 10000000);
+  if (/lakh|lac/i.test(priceStr)) return Math.round(num * 100000);
+  return Math.round(num);
+}
+
 export default function PropertyCard({ p, index }: { p: Property; index: number }) {
   const contact = useContactInfo();
   const [i, setI] = useState(0);
@@ -14,6 +23,20 @@ export default function PropertyCard({ p, index }: { p: Property; index: number 
   const prev = (e: React.MouseEvent) => {
     e.stopPropagation();
     setI((v) => (v - 1 + p.images.length) % p.images.length);
+  };
+
+  const handleOpenEmiCalculator = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const numericPrice = parsePriceToNumber(p.price);
+    window.dispatchEvent(
+      new CustomEvent("yr:calculate-emi", {
+        detail: { price: numericPrice, title: p.title },
+      })
+    );
+    const el = document.getElementById("calculator");
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   const whatsappMsg =

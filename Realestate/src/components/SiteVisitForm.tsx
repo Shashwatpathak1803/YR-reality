@@ -4,6 +4,22 @@ import { useState } from "react";
 import { formatWhatsAppUrl, submitSiteVisit, TARGET_WHATSAPP_NUMBER, useContactInfo } from "@/lib/api";
 import { BUDGETS } from "@/lib/search-filter";
 
+function getTomorrowDateString(): string {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  return tomorrow.toISOString().slice(0, 10);
+}
+
+function cleanIndianPhone(val: string): string {
+  let digits = val.replace(/\D/g, "");
+  if (digits.length === 12 && digits.startsWith("91")) {
+    digits = digits.slice(2);
+  } else if (digits.length === 11 && digits.startsWith("0")) {
+    digits = digits.slice(1);
+  }
+  return digits;
+}
+
 /**
  * The booking form — reused by the page section and the timed popup.
  * `plain` drops the glass card chrome for embedding inside a dialog.
@@ -18,28 +34,32 @@ export function SiteVisitFormCard({ onBooked, plain = false }: { onBooked?: () =
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [location, setLocation] = useState("");
-  const [date, setDate] = useState("");
+  const [date, setDate] = useState(() => getTomorrowDateString());
   const [budget, setBudget] = useState(BUDGETS[0]);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    if (!name.trim() || !phone.trim() || !date) {
-      setError("Please fill your name, phone and preferred date.");
+
+    const cleanedPhone = cleanIndianPhone(phone);
+    if (!name.trim()) {
+      setError("Please enter your name.");
       return;
     }
-    if (!/^[6-9]\d{9}$/.test(phone.trim())) {
+    if (!cleanedPhone || cleanedPhone.length !== 10) {
       setError("Please enter a valid 10-digit mobile number.");
       return;
     }
+
+    const finalDate = date || getTomorrowDateString();
     setSending(true);
 
     const waText =
       `🚗 *New Site Visit Booking - YR Realty*\n\n` +
       `👤 *Name:* ${name.trim()}\n` +
-      `📞 *Phone:* ${phone.trim()}\n` +
+      `📞 *Phone:* ${cleanedPhone}\n` +
       (location.trim() ? `📍 *Preferred Location:* ${location.trim()}\n` : "") +
-      `📅 *Preferred Date:* ${date}\n` +
+      `📅 *Preferred Date:* ${finalDate}\n` +
       `💰 *Budget:* ${budget}`;
 
     const generatedWaUrl = formatWhatsAppUrl(waText, contact.whatsapp || TARGET_WHATSAPP_NUMBER);
@@ -48,8 +68,9 @@ export function SiteVisitFormCard({ onBooked, plain = false }: { onBooked?: () =
     try {
       await submitSiteVisit({
         name: name.trim(),
-        phone: phone.trim(),
-        preferredDate: date,
+        phone: cleanedPhone,
+        preferredDate: finalDate,
+        preferredTime: "Flexible / Morning",
         location: location.trim() || undefined,
         notes: `Budget: ${budget}`,
       });
@@ -57,7 +78,10 @@ export function SiteVisitFormCard({ onBooked, plain = false }: { onBooked?: () =
       onBooked?.();
       window.open(generatedWaUrl, "_blank", "noopener,noreferrer");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+      // If backend network error or cold-start, still mark sent and open WhatsApp so lead is never lost
+      setSent(true);
+      onBooked?.();
+      window.open(generatedWaUrl, "_blank", "noopener,noreferrer");
     } finally {
       setSending(false);
     }
@@ -88,6 +112,7 @@ export function SiteVisitFormCard({ onBooked, plain = false }: { onBooked?: () =
   return (
     <form
       onSubmit={onSubmit}
+      noValidate
       className={
         plain
           ? ""
@@ -129,7 +154,8 @@ export function SiteVisitFormCard({ onBooked, plain = false }: { onBooked?: () =
       </div>
       {error && <p className="mt-3 text-xs font-semibold text-red-600">{error}</p>}
       <button
-        type="submit"
+        type="button"
+        onClick={onSubmit}
         disabled={sending}
         className="mt-4 w-full inline-flex items-center justify-center gap-2 h-11 rounded-xl bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 text-neutral-900 font-semibold shadow-[0_8px_24px_rgba(217,180,80,0.3)] hover:shadow-[0_12px_32px_rgba(217,180,80,0.45)] transition-all duration-300 disabled:opacity-70"
       >

@@ -20,7 +20,7 @@ function useServiceWorker() {
       const registerSW = () => {
         navigator.serviceWorker
           .register("/sw.js", { scope: "/" })
-          .then((reg) => console.log("[YR SW] registered", reg.scope))
+          .then((reg) => console.log("[YR SW] registered", reg?.scope))
           .catch((err) => console.warn("[YR SW] registration failed", err));
       };
 

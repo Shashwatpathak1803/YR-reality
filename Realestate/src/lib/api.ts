@@ -9,15 +9,22 @@ const API_URL =
   (import.meta.env.VITE_API_URL as string | undefined) ?? "http://localhost:5000/api";
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_URL}${path}`, {
-    headers: { "Content-Type": "application/json" },
-    ...init,
-  });
-  const body = await res.json().catch(() => null);
-  if (!res.ok) {
-    throw new Error(body?.message ?? `Request failed (${res.status})`);
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000);
+  try {
+    const res = await fetch(`${API_URL}${path}`, {
+      headers: { "Content-Type": "application/json" },
+      signal: controller.signal,
+      ...init,
+    });
+    const body = await res.json().catch(() => null);
+    if (!res.ok) {
+      throw new Error(body?.message ?? `Request failed (${res.status})`);
+    }
+    return body.data as T;
+  } finally {
+    clearTimeout(timeoutId);
   }
-  return body.data as T;
 }
 
 // ---------------------------------------------------------------------------
@@ -260,7 +267,7 @@ export interface SiteVisitPayload {
   phone: string;
   email?: string;
   preferredDate: string; // ISO date
-  preferredTime: string;
+  preferredTime?: string;
   location?: string;
   notes?: string;
 }

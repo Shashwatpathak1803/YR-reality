@@ -32,7 +32,7 @@ function matchesFilter(
   if (!isAnyType) {
     const categoryName = p.category && typeof p.category === "object" ? p.category.name : (p.category ?? "");
     const haystack = `${categoryName} ${p.title} ${p.shortDescription ?? ""} ${p.description ?? ""}`.toLowerCase();
-    
+
     const filterLower = filter.type.toLowerCase();
     const normFilter = filterLower
       .replace(/houses/g, "house")

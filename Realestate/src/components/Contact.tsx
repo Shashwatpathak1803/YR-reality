@@ -3,6 +3,16 @@ import { Phone, Mail, MapPin, Send, Loader2, MessageCircle } from "lucide-react"
 import { useState } from "react";
 import { formatWhatsAppUrl, submitEnquiry, TARGET_WHATSAPP_NUMBER, trackContactClick, useContactInfo } from "@/lib/api";
 
+function cleanIndianPhone(val: string): string {
+  let digits = val.replace(/\D/g, "");
+  if (digits.length === 12 && digits.startsWith("91")) {
+    digits = digits.slice(2);
+  } else if (digits.length === 11 && digits.startsWith("0")) {
+    digits = digits.slice(1);
+  }
+  return digits;
+}
+
 export default function Contact() {
   const contact = useContactInfo();
   const [sent, setSent] = useState(false);
@@ -18,15 +28,13 @@ export default function Contact() {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    const cleanedPhone = cleanIndianPhone(phone);
     if (!name.trim()) {
       setError("Please fill your name.");
       return;
     }
-    if (!phone.trim()) {
-      setError("Please fill your phone number.");
-      return;
-    }
-    if (!/^[6-9]\d{9}$/.test(phone.trim())) {
+    if (!cleanedPhone || cleanedPhone.length !== 10) {
       setError("Please enter a valid 10-digit mobile number.");
       return;
     }
@@ -35,7 +43,7 @@ export default function Contact() {
     const waText =
       `🚨 *New Property Enquiry - YR Realty*\n\n` +
       `👤 *Name:* ${name.trim()}\n` +
-      `📞 *Phone:* ${phone.trim()}\n` +
+      `📞 *Phone:* ${cleanedPhone}\n` +
       (email.trim() ? `✉️ *Email:* ${email.trim()}\n` : "") +
       (message.trim() ? `💬 *Message:* ${message.trim()}\n` : "") +
       `📍 *Source:* Website Contact Form`;
@@ -46,7 +54,7 @@ export default function Contact() {
     try {
       await submitEnquiry({
         name: name.trim(),
-        phone: phone.trim(),
+        phone: cleanedPhone,
         email: email.trim() || undefined,
         message: message.trim() || undefined,
         sourcePage: "contact",
@@ -54,7 +62,8 @@ export default function Contact() {
       setSent(true);
       window.open(generatedWaUrl, "_blank", "noopener,noreferrer");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+      setSent(true);
+      window.open(generatedWaUrl, "_blank", "noopener,noreferrer");
     } finally {
       setSending(false);
     }
@@ -167,6 +176,7 @@ export default function Contact() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             onSubmit={onSubmit}
+            noValidate
             className="lg:col-span-3 rounded-3xl p-8 bg-white border border-neutral-200/70 shadow-[0_4px_24px_rgba(0,0,0,0.06)]"
           >
             <h3 className="font-display font-bold text-2xl text-neutral-900">Send us a message</h3>
@@ -220,7 +230,8 @@ export default function Contact() {
                 </div>
                 {error && <p className="mt-3 text-xs font-semibold text-red-600">{error}</p>}
                 <button
-                  type="submit"
+                  type="button"
+                  onClick={onSubmit}
                   disabled={sending}
                   className="mt-6 inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 text-neutral-900 font-semibold shadow-[0_8px_24px_rgba(217,180,80,0.3)] hover:shadow-[0_12px_32px_rgba(217,180,80,0.45)] hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-60 disabled:hover:translate-y-0"
                 >

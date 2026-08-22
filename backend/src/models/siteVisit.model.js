@@ -7,7 +7,7 @@ const siteVisitSchema = new mongoose.Schema(
     phone: { type: String, required: true, trim: true },
     email: { type: String, trim: true, lowercase: true },
     preferredDate: { type: Date, required: true },
-    preferredTime: { type: String, required: true },
+    preferredTime: { type: String, trim: true },
     property: { type: mongoose.Schema.Types.ObjectId, ref: 'Property' },
     location: String,
     notes: String,

@@ -1,0 +1,16 @@
+{
+  "name": "yr-realty",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Full-stack MERN Real Estate project with Playwright E2E automation",
+  "scripts": {
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.50.1",
+    "@types/node": "^22.13.4"
+  }
+}

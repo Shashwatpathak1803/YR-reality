@@ -11,6 +11,7 @@ import FAQ from "@/components/FAQ";
 import Contact from "@/components/Contact";
 import SiteVisitForm from "@/components/SiteVisitForm";
 import SiteVisitPopup from "@/components/SiteVisitPopup";
+import EmiCalculator from "@/components/EmiCalculator";
 import Footer from "@/components/Footer";
 import FloatingButtons from "@/components/FloatingButtons";
 import LiveBot from "@/components/LiveBot";
@@ -84,6 +85,7 @@ function Index() {
           <FeaturedProperties />
           <WhyChooseUs />
           <Process />
+          <EmiCalculator />
           <Gallery />
           <Testimonials />
           <FAQ />

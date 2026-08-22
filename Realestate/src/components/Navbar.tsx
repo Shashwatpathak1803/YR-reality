@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Home, Building2, Sparkles, Image as ImageIcon, MessageCircle, HelpCircle, Phone } from "lucide-react";
+import { Menu, X, Home, Building2, Sparkles, Image as ImageIcon, MessageCircle, HelpCircle, Phone, Calculator } from "lucide-react";
 import logo from "../assets/logoyr.png";
 import { formatWhatsAppUrl, TARGET_WHATSAPP_NUMBER, useContactInfo } from "@/lib/api";
 
 const links = [
   { href: "#home", label: "Home", icon: Home },
   { href: "#properties", label: "Properties", icon: Building2 },
+  { href: "#calculator", label: "EMI Calculator", icon: Calculator },
   { href: "#why", label: "Why Choose Us", icon: Sparkles },
   { href: "#gallery", label: "Gallery", icon: ImageIcon },
   { href: "#testimonials", label: "Testimonials", icon: MessageCircle },
