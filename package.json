@@ -3,6 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "description": "Full-stack MERN Real Estate project with Playwright E2E automation",
+  "workspaces": [
+    "Realestate",
+    "admin_panel",
+    "backend"
+  ],
   "scripts": {
     "build": "npm run build --prefix Realestate",
     "test:e2e": "playwright test",

@@ -5,7 +5,8 @@ import axios from "axios";
  * Override the target with VITE_API_URL (e.g. https://api.example.com/api).
  */
 const baseURL =
-  (import.meta.env.VITE_API_URL as string | undefined) ?? "http://localhost:5000/api";
+  (import.meta.env.VITE_API_URL as string | undefined) ??
+  "https://yr-realty-backend.onrender.com/api";
 
 export const api = axios.create({
   baseURL,

@@ -6,11 +6,12 @@
 import { useQuery } from "@tanstack/react-query";
 
 const API_URL =
-  (import.meta.env.VITE_API_URL as string | undefined) ?? "http://localhost:5000/api";
+  (import.meta.env.VITE_API_URL as string | undefined) ??
+  "https://yr-realty-backend.onrender.com/api";
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 10000);
+  const timeoutId = setTimeout(() => controller.abort(), 60000);
   try {
     const res = await fetch(`${API_URL}${path}`, {
       headers: { "Content-Type": "application/json" },

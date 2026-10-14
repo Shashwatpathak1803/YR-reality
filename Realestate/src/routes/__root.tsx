@@ -11,7 +11,6 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import InstallPrompt from "../components/InstallPrompt";
 
 /** Register the YR Realty service worker */
 function useServiceWorker() {
@@ -157,8 +156,6 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
-      {/* PWA Install Prompt */}
-      <InstallPrompt />
     </QueryClientProvider>
   );
 }

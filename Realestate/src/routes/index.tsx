@@ -14,7 +14,6 @@ import SiteVisitPopup from "@/components/SiteVisitPopup";
 import EmiCalculator from "@/components/EmiCalculator";
 import Footer from "@/components/Footer";
 import FloatingButtons from "@/components/FloatingButtons";
-import LiveBot from "@/components/LiveBot";
 import { DEFAULT_CONTACT, getContactInfoSnapshot } from "@/lib/api";
 import { SearchFilterProvider } from "@/lib/search-filter";
 
@@ -94,7 +93,6 @@ function Index() {
         </main>
         <Footer />
         <FloatingButtons />
-        <LiveBot />
         <SiteVisitPopup />
       </div>
     </SearchFilterProvider>
