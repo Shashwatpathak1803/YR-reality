@@ -1,6 +1,6 @@
 // YR Realty — Service Worker (Cache-First for assets, Network-First for API)
-const CACHE_NAME = 'yr-realty-v2';
-const API_CACHE  = 'yr-realty-api-v2';
+const CACHE_NAME = 'yr-realty-v3';
+const API_CACHE  = 'yr-realty-api-v3';
 
 
 // Assets to pre-cache on install
